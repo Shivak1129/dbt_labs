@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: raw_data
+    schema: SF_SCHEMA
+    database: SNOWFLAKE_DBT_DATA
+    tables:
+      - name: CUSTOMER
+  - name: prod_data
+    schema: PROD_SCH
+    database: SNOWFLAKE_DBT_DATA
+    tables:
+      - name: PRODUCT

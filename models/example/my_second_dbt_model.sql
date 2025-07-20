@@ -2,7 +2,8 @@
 
 {{
     config(
-        materialized='view',
+        materialized='table',
+        transient=false,
         tags=["dbt_only"]
     )
 }}
