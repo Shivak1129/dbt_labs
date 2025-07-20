@@ -1,5 +1,11 @@
+-- models/my_second_dbt_model.sql
 
--- Use the `ref` function to select from other models
+{{
+    config(
+        materialized='view',
+        tags=["dbt_only"]
+    )
+}}
 
 select *
 from {{ ref('my_first_dbt_model') }}
