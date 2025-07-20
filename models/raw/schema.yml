@@ -11,3 +11,8 @@ sources:
     database: SNOWFLAKE_DBT_DATA
     tables:
       - name: PRODUCT
+  - name : sale_data
+    schema: SF_SCHEMA
+    database: SNOWFLAKE_DBT_DATA
+    tables:
+      - name: SALES_TRANSACTIONS
