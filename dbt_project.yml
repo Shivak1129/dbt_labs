@@ -54,6 +54,10 @@ models:
       orders_insert_overwrite:
         +materialized: incremental
         +incremental_strategy: insert_overwrite
+      country_status:        # override config for this model only
+        +materialized: view  # override materialization to 'view'
+        +database: DBT_CLEAN # assign a different database
+        +schema: CLEAN_SCHEMA  # optional if you want to change schema
     silver:
       +database: DBT_LABS
       +schema: SILVER_SCH
@@ -62,4 +66,28 @@ models:
       +schema: clean_schema
       +database: DBT_CLEAN
       +materialized: view
+
+seeds:
+  dbt_lab_project:
+    +enabled: true
+    +schema: CLEAN_SCHEMA
+    +database: DBT_CLEAN
+  
+    country_info: #default it will take as ',' seperator
+      +column_types:
+        country_code: varchar(100)
+        country_name: varchar(100)
+        region: varchar(100)
+        currency: varchar(100)
+        language: varchar(100)
+    country_popluation:
+    country_internet:
+      +delimiter: '|'
+      +schema: CLEAN_SCHEMA
+      +column_types:
+        country_code: varchar(100)
+        internet_users_millions: number
+        mobile_subscriptions_millions: number
+        sim_card_prefix: varchar(10)
+      
 
