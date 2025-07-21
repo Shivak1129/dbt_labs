@@ -16,3 +16,13 @@ sources:
     database: SNOWFLAKE_DBT_DATA
     tables:
       - name: SALES_TRANSACTIONS
+  - name : order_data
+    schema: SF_SCHEMA
+    database: SNOWFLAKE_DBT_DATA
+    tables :
+      - name: orders
+  - name: supply_data
+    schema: SF_SCHEMA
+    database: SNOWFLAKE_DBT_DATA
+    tables:
+      - name: SUPPLY_CHAIN_ORDERS

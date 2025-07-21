@@ -1,0 +1,58 @@
+version: 2
+
+snapshots:
+
+  - name: supply_chain_orders_snapshot_new
+    description: >
+      Timestamp-based snapshot for tracking updates to supply chain orders. 
+      Uses the `UPDATED_AT` column to identify new changes.
+    relation: source('supply_data', 'SUPPLY_CHAIN_ORDERS')
+    config:
+      database: DBT_LABS
+      schema: SILVER_SCH
+      unique_key: ORDER_ID
+      strategy: timestamp
+      updated_at: UPDATED_AT
+      hard_deletes: ignore  # options are: 'ignore', 'invalidate'
+      dbt_valid_to_current: "to_date('9999-12-31')" # Specifies that current records should have `dbt_valid_to` set to `'9999-12-31'` instead of `NULL`.
+      query_tag: dbt
+
+  - name: supply_chain_orders_snapshot_key_based_new
+    description: >
+      Check-based snapshot for tracking changes across key business columns.
+      Ignores deletes unless explicitly configured.
+    relation: source('supply_data', 'SUPPLY_CHAIN_ORDERS')
+    config:
+      database: DBT_LABS
+      schema: SILVER_SCH
+      unique_key: ORDER_ID
+      strategy: check
+      check_cols: ['SUPPLIER_NAME','PRODUCT_NAME','QUANTITY','UNIT_COST','TOTAL_COST','STATUS','DELIVERY_DATE']
+      hard_deletes: invalidate  # options are: 'ignore', 'invalidate'
+      dbt_valid_to_current: "to_date('9999-12-31')" # Specifies that current records should have `dbt_valid_to` set to `'9999-12-31'` instead of `NULL`.
+      query_tag: dbt
+
+  - name: supply_chain_orders_snapshot_key_based_hard_delete_new
+    description: >
+      Check-based snapshot that also tracks hard deletes.
+      Ensures that deleted records are marked inactive.
+      Tracks data changes and hard deletes; prevents stale data older than 90 days.
+    relation: source('supply_data', 'SUPPLY_CHAIN_ORDERS')
+    config:
+      database: DBT_LABS
+      schema: SILVER_SCH
+      unique_key: ORDER_ID
+      strategy: check
+      check_cols:
+        - SUPPLIER_NAME
+        - PRODUCT_NAME
+        - QUANTITY
+        - UNIT_COST
+        - TOTAL_COST
+        - STATUS
+        - DELIVERY_DATE
+      snapshot_freshness: 90 days
+      hard_deletes: invalidate  # options are: 'ignore', 'invalidate'
+      dbt_valid_to_current: "to_date('9999-12-31')" # Specifies that current records should have `dbt_valid_to` 
+                                                    #set to `'9999-12-31'` instead of `NULL`.
+      query_tag: dbt
