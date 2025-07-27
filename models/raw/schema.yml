@@ -26,3 +26,14 @@ sources:
     database: SNOWFLAKE_DBT_DATA
     tables:
       - name: SUPPLY_CHAIN_ORDERS
+  - name: tele_customer
+    schema: SF_SCHEMA
+    database: SNOWFLAKE_DBT_DATA
+    tables:
+      - name: TELECOM_CUSTOMERS
+  - name: tele_telecom_plans
+    schema: SF_SCHEMA
+    database: SNOWFLAKE_DBT_DATA
+    tables:
+      - name: TELE_PLANS
+        identifier: TELECOM_PLANS
