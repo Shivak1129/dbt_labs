@@ -1,0 +1,60 @@
+version: 2
+
+models:
+  - name: customer_analysis
+    description: "Customer information"
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              field: customer_id
+              to: source('tele_customer', 'TELECOM_CUSTOMERS')
+
+      - name: email
+        tests:
+          - not_null
+          - valid_email_format:
+              severity: warn
+              tags: ['Data_quality']
+
+      - name: gender
+        tests:
+          - accepted_values:
+              values: ['Male', 'Female']
+
+      - name: age
+        tests:
+          - not_null
+          - value_between_range:
+              min_value: 18
+              max_value: 100
+              tags: ['age_range_check']
+
+    tests:
+      - duplicate_check:
+          column_names: ['EMAIL', 'FULL_NAME']
+          tags: ['Data_quality']
+
+      - accepted_values_lowercase:
+          columns:
+            gender: ['male', 'female']
+            city: [
+              'dehradun','srinagar','trivandrum','guwahati','bhopal','new delhi','mumbai',
+              'patna','panaji','lucknow','bengaluru','amritsar','kochi',
+              'gurgaon','jaipur','vijayawada','hyderabad','chennai','raipur','ahmedabad'
+            ]
+          tags: ['Data_quality']
+
+      - accepted_values_mixedcase:
+          titlecase_cols:
+            gender: ['Male', 'Female']
+          lowercase_cols:
+            city: [
+              'dehradun', 'srinagar', 'trivandrum', 'guwahati', 'bhopal',
+              'new delhi', 'mumbai', 'patna', 'panaji', 'lucknow', 'bengaluru',
+              'amritsar', 'kochi', 'gurgaon', 'jaipur', 'vijayawada',
+              'hyderabad', 'chennai', 'raipur', 'ahmedabad'
+            ]
+          tags: ['Data_quality']

@@ -31,9 +31,54 @@ sources:
     database: SNOWFLAKE_DBT_DATA
     tables:
       - name: TELECOM_CUSTOMERS
+        columns:
+          - name: customer_id
+            tests:
+              - not_null
+              - unique
+          - name: email
+            tests:
+              - not_null
+          - name: mobile_number
+            tests:
+              - not_null
+              - unique
+          - name: gender
+            tests:
+              - accepted_values:
+                  values: ['Male', 'Female']
+          - name: age
+            tests:
+              - not_null
+              - value_between_range:
+                  min_value: 18
+                  max_value: 100
+        tests:
+        - duplicate_check:
+            column_names: ['email', 'mobile_number']
+
   - name: tele_telecom_plans
     schema: SF_SCHEMA
     database: SNOWFLAKE_DBT_DATA
     tables:
       - name: TELE_PLANS
         identifier: TELECOM_PLANS
+        columns:
+          - name: plan_id
+            tests:
+              - not_null
+              - unique
+          - name: customer_id
+            tests:
+              - not_null
+              - relationships:
+                  to: source('tele_customer', 'TELECOM_CUSTOMERS')  # If it's a source
+                  field: customer_id
+          - name: plan_type
+            tests:
+              - accepted_values:
+                  values: ['Prepaid', 'Postpaid']
+          - name: price
+            tests:
+              - not_null
+    
