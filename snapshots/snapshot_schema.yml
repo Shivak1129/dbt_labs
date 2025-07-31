@@ -16,7 +16,7 @@ snapshots:
       hard_deletes: ignore  # options are: 'ignore', 'invalidate'
       dbt_valid_to_current: "to_date('9999-12-31')" # Specifies that current records should have `dbt_valid_to` set to `'9999-12-31'` instead of `NULL`.
       query_tag: dbt
-
+      
   - name: supply_chain_orders_snapshot_key_based_new
     description: >
       Check-based snapshot for tracking changes across key business columns.

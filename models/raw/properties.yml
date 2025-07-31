@@ -11,7 +11,6 @@ models:
           - relationships:
               field: customer_id
               to: source('tele_customer', 'TELECOM_CUSTOMERS')
-
       - name: email
         tests:
           - not_null
@@ -58,3 +57,7 @@ models:
               'hyderabad', 'chennai', 'raipur', 'ahmedabad'
             ]
           tags: ['Data_quality']
+  - name: hook_example
+    description: "hook demo information"
+  
+      

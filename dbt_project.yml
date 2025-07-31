@@ -37,10 +37,36 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 models:
   dbt_lab_project:
+    +pre-hook:
+      - >
+        INSERT INTO SNOWFLAKE_DBT_DATA.SF_SCHEMA.MODEL_RUN_AUDIT (model_name, execution_time_start)
+        VALUES ('{{ model.name }}', CURRENT_TIMESTAMP);
+    +post-hook:
+      - >
+        UPDATE SNOWFLAKE_DBT_DATA.SF_SCHEMA.MODEL_RUN_AUDIT
+        SET execution_time_end = CURRENT_TIMESTAMP,
+            row_count = (SELECT COUNT(*) FROM {{ this }})
+        WHERE model_name = '{{ model.name }}'
+          AND execution_time_end IS NULL;
     # Applies to all files under models/example/
     example:
       +materialized: view
     raw:
+      +pre-hook:
+        - >
+          INSERT INTO SNOWFLAKE_DBT_DATA.SF_SCHEMA.MODEL_RUN_AUDIT 
+          (model_name, database_name, schema_name, execution_time_start)
+          VALUES ('{{ this.identifier }}', '{{ this.database }}', '{{ this.schema }}', CURRENT_TIMESTAMP)
+
+      +post-hook:
+        - >
+          UPDATE SNOWFLAKE_DBT_DATA.SF_SCHEMA.MODEL_RUN_AUDIT
+          SET execution_time_end = CURRENT_TIMESTAMP,
+              row_count = (SELECT COUNT(*) FROM {{ this }})
+          WHERE model_name = '{{ this.identifier }}'
+            AND database_name = '{{ this.database }}'
+            AND schema_name = '{{ this.schema }}'
+            AND execution_time_end IS NULL
       +materialized: table
       orders_incremental_append:             # model name (orders.sql)
         +materialized: incremental
@@ -57,7 +83,7 @@ models:
       country_status:        # override config for this model only
         +materialized: view  # override materialization to 'view'
         +database: DBT_CLEAN # assign a different database
-        +schema: CLEAN_SCHEMA  # optional if you want to change schema
+        +schema: CLEAN_SCHEMA  # optional if you want to change schema       
     silver:
       +database: DBT_LABS
       +schema: SILVER_SCH
@@ -89,5 +115,8 @@ seeds:
         internet_users_millions: number
         mobile_subscriptions_millions: number
         sim_card_prefix: varchar(10)
-      
 
+snapshots:
+  snapshots.supply_chain_orders_snapshot_new:
+    +pre-hook: "{{ log_snapshot_start('my_snapshot') }}"
+    +post-hook: "{{ log_snapshot_end2('my_snapshot', 'my_snapshot') }}"
